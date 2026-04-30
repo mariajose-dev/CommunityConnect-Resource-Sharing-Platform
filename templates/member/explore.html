@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;"
+        class="mb-4">
+        <h2>Explore Items</h2>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4" style="padding: 20px;">
+        <form method="get" action="{% url 'explore' %}"
+            style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 250px;">
+                <label class="form-label" style="font-size: 0.9rem;">Search Keyword</label>
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-input"
+                    placeholder="Search title or description...">
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label class="form-label" style="font-size: 0.9rem;">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}"
+    {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+    {{ cat.name }}
+</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label class="form-label" style="font-size: 0.9rem;">Locality</label>
+                <select name="locality" class="form-select">
+    <option value="">All Localities</option>
+    {% for loc in localities %}
+        <option value="{{ loc }}"
+            {% if request.GET.locality == loc %}selected{% endif %}>
+            {{ loc }}
+        </option>
+    {% endfor %}
+</select>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                
+                <div style="flex: 1; min-width: 150px;">
+    <label class="form-label" style="font-size: 0.9rem;">Sort By</label>
+    <select name="sort" class="form-select">
+        <option value="">Select</option>
+        <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>
+            Highest Rating
+        </option>
+        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>
+            Newest First
+        </option>
+    </select>
+</div>
+            </div>
+            <div>
+                <button type="submit" class="btn-primary">Filter</button>
+                <a href="{% url 'explore' %}" class="btn-outline"
+                    style="margin-left: 5px; padding: 10px 15px;">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="grid">
+        {% for item in items %}
+        <div class="card">
+            {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="card-img">
+            {% else %}
+            <div class="card-img"
+                style="display:flex; align-items:center; justify-content:center; background:#E6F0FA; color:#64748B;">No Image</div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h3 style="margin-bottom: 5px;">{{ item.title }}</h3>
+                <span
+                    style="font-size: 0.8rem; background: #E6F0FA; padding: 3px 8px; border-radius: 12px; color: var(--primary-dark);">{{ item.status }}</span>
+            </div>
+
+            <p class="text-muted"
+                style="font-size: 0.9rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ item.description }}
+            </p>
+
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--primary-light); padding-top: 15px; margin-bottom: 15px;">
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Shared by</div>
+                    <a href="{% url 'user_profile' item.owner.username %}"
+                        style="font-weight: 500; display: block; color: var(--primary-dark);">{{ item.owner.username }}</a>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.85rem;">★ {{ item.owner.average_rating|floatformat:1 }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.owner.locality|default:"No Locality" }}</div>
+                </div>
+            </div>
+
+            <a href="{% url 'item_detail' item.id %}" class="btn-primary" style="display:block; text-align:center;">View Details</a>
+        </div>
+        {% empty %}
+        <div class="card text-center" style="grid-column: 1 / -1; padding: 50px;">
+            <h3>No items found</h3>
+            <p class="text-muted mt-4">Try adjusting your filters or check back later.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

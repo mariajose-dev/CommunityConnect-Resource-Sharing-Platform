@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}" class="active">Manage Categories</a>
+            <a href="{% url 'manage_users' %}">Manage Users</a>
+            <a href="{% url 'all_items' %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;" class="mb-4">
+            <h2>Manage Categories</h2>
+            <a href="{% url 'add_category' %}" class="btn-primary">+ Add New Category</a>
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+            {% for cat in categories %}
+            <div class="card">
+                <h3 style="margin-bottom: 10px;">{{ cat.name }}</h3>
+                <p class="text-muted" style="margin-bottom: 15px;">{{ cat.description }}</p>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Added: {{ cat.created_at|date:"M d, Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="card text-center" style="grid-column: 1 / -1; padding: 40px;">
+                <p class="text-muted">No categories available. Please add some.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

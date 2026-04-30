@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}"
+                class="{% if request.resolver_match.url_name == 'manage_categories' %}active{% endif %}">Manage
+                Categories</a>
+            <a href="{% url 'manage_users' %}"
+                class="{% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">Manage Users</a>
+            <a href="{% url 'all_items' %}"
+                class="{% if request.resolver_match.url_name == 'all_items' %}active{% endif %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}"
+                class="{% if request.resolver_match.url_name == 'all_borrow_records' %}active{% endif %}">Borrow
+                Records</a>
+            <a href="{% url 'monitor_reviews' %}"
+                class="{% if request.resolver_match.url_name == 'monitor_reviews' %}active{% endif %}">Monitor
+                Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h2 class="mb-4">Admin Dashboard</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_users }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ total_items }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ total_requests }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Total Requests</div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <h3>Quick Actions</h3>
+            <div class="mt-4" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{% url 'add_category' %}" class="btn-primary">Add Category</a>
+                <a href="{% url 'manage_users' %}" class="btn-outline">View Users</a>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

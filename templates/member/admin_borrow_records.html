@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}">Manage Categories</a>
+            <a href="{% url 'manage_users' %}">Manage Users</a>
+            <a href="{% url 'all_items' %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}" class="active">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="mb-4">System Borrow Records</h2>
+
+        <div class="card p-0" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--primary-light);">
+                    <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Item</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Lender</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Borrower</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Approved At</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Collected On</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Closed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr style="border-bottom: 1px solid var(--primary-light);">
+                        <td style="padding: 15px;"><a href="{% url 'item_detail' r.borrow_request.item.id %}"
+                                style="font-weight: 500; color: var(--primary-dark);">{{ r.borrow_request.item.title }}</a></td>
+                        <td style="padding: 15px;"><a
+                                href="{% url 'user_profile' r.borrow_request.item.owner.username %}">{{ r.borrow_request.item.owner.username }}</a></td>
+                        <td style="padding: 15px;"><a
+                                href="{% url 'user_profile' r.borrow_request.requester.username %}">{{ r.borrow_request.requester.username }}</a></td>
+                        <td style="padding: 15px;">{{ r.borrow_request.approved_at|date:"M d, Y" }}</td>
+                        <td style="padding: 15px;">{{ r.collected_on|date:"M d, Y"|default:"Not Collected" }}</td>
+                        <td style="padding: 15px;">{{ r.closed_at|date:"M d, Y"|default:"Open" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 20px;">No borrow records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

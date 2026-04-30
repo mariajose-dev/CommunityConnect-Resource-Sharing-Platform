@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 900px; padding: 20px;">
+
+    <!-- Profile Header -->
+    <div class="card"
+        style="display: flex; gap: 30px; align-items: center; position: relative; margin-bottom: 30px; flex-wrap: wrap;">
+        {% if request.user == profile_user %}
+        <a href="{% url 'profile_edit' %}" class="btn-outline"
+            style="position: absolute; top: 20px; right: 20px; padding: 6px 15px; font-size: 0.9rem;">Edit Profile</a>
+        {% endif %}
+
+        <div style="flex-shrink: 0; text-align: center;">
+            {% if profile_user.profile_image %}
+            <img src="{{ profile_user.profile_image.url }}" alt="{{ profile_user.username }}"
+                style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-light);">
+            {% else %}
+            <div
+                style="width: 150px; height: 150px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border: 4px solid var(--primary-light);">
+                {{ profile_user.username|make_list|first|upper }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                <h1 style="margin: 0;">{{ profile_user.username }}</h1>
+                {% if profile_user.badge %}
+                <span
+                    style="background: var(--primary-dark); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                    {{ profile_user.badge }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div style="color: var(--text-muted); margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+                <div><i class="fas fa-map-marker-alt"></i> {{ profile_user.locality|default:"No Locality" }}</div>
+                <div>Joined: {{ profile_user.date_joined|date:"M Y" }}</div>
+                {% if profile_user.google_map_link %}
+                <div><a href="{{ profile_user.google_map_link }}" target="_blank"
+                        style="color: var(--primary-dark);">View on Map</a></div>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 40px;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">★ {{ profile_user.average_rating|floatformat:1 }}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Avg Rating</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">{{ profile_user.points }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Points</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">{{ items_shared }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Items Shared</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">{{ items_avail }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Currently Available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User's Items (Visible dynamically based on exploration view or specific) -->
+
+    <!-- Reviews Received -->
+    <h3 class="mb-4">Reviews Left For {{ profile_user.username }}</h3>
+    {% if reviews %}
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        {% for review in reviews %}
+        <div class="card" style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <a href="{% url 'user_profile' review.reviewer.username %}"
+                        style="font-weight: 600; color: var(--text-main);">{{ review.reviewer.username }}</a>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">borrowed {{ review.item.title }}</span>
+                </div>
+                <div style="color: #F59E0B; font-weight: bold; font-size: 1.1rem;">
+                    {% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
+                        </div>
+                </div>
+                {% if review.comment %}
+                <p
+                    style="color: var(--text-main); font-style: italic; background: var(--bg-color); padding: 15px; border-radius: var(--radius-md); margin: 0;">
+                    "{{ review.comment }}"</p>
+                {% endif %}
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 10px;">{{
+                    review.created_at|date:"M d, Y" }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card text-center" style="padding: 40px;">
+            <p class="text-muted">No reviews yet for {{ profile_user.username }}.</p>
+        </div>
+        {% endif %}
+
+    </div>
+    {% endblock %}

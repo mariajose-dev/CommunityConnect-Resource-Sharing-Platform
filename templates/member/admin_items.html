@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}">Manage Categories</a>
+            <a href="{% url 'manage_users' %}">Manage Users</a>
+            <a href="{% url 'all_items' %}" class="active">All Items</a>
+            <a href="{% url 'all_borrow_records' %}">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="mb-4">All Platform Items</h2>
+
+        <div class="card p-0" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--primary-light);">
+                    <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Item</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Category</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Owner</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Status</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Reports</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Active</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in items %}
+                    <tr style="border-bottom: 1px solid var(--primary-light);">
+                        <td style="padding: 15px;"><a href="{% url 'item_detail' i.id %}"
+                                style="font-weight: 500; color: var(--primary-dark);">{{ i.title }}</a></td>
+                        <td style="padding: 15px;">{{ i.category.name }}</td>
+                        <td style="padding: 15px;"><a href="{% url 'user_profile' i.owner.username %}">{{ i.owner.username }}</a></td>
+                        <td style="padding: 15px;">{{ i.status }}</td>
+                        <td style="padding: 15px;">
+                            {% if i.report_count > 0 %}
+                            <span style="color: #9B1C1C; font-weight: bold;">{{ i.report_count }}</span>
+                            {% else %}
+                            0
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">
+                            {% if i.is_active %}
+                            <span
+                                style="background: #DEF7EC; color: #03543F; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Yes</span>
+                            {% else %}
+                            <span
+                                style="background: #FDE8E8; color: #9B1C1C; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">No</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">
+                            <form method="post" action="{% url 'toggle_item_active' i.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-outline"
+                                    style="padding: 6px 12px; font-size: 0.85rem; {% if i.is_active and i.report_count > 0 %}color:#9B1C1C; border-color:#9B1C1C;{% endif %}">
+                                    {% if i.is_active %}Deactivate{% else %}Activate{% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center" style="padding: 20px;">No items found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

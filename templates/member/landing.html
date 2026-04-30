@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1>Share Resources. Build Community.</h1>
+        <p>CommunityConnect is a non-monetary resource-sharing platform where neighbors borrow and lend items without
+            spending a dime.</p>
+        <div class="mt-4">
+            <a href="{% url 'explore' %}" class="btn-primary" style="margin-right: 15px;">Explore Items</a>
+            <a href="{% url 'register' %}" class="btn-outline">Join Now</a>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4" style="padding: 60px 20px;">
+    <h2 class="text-center mb-4">How It Works</h2>
+    <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px;">
+        <div class="card text-center">
+            <h3>1. List Items</h3>
+            <p class="text-muted mt-4">Add items you have lying around that others might need.</p>
+        </div>
+        <div class="card text-center">
+            <h3>2. Request & Borrow</h3>
+            <p class="text-muted mt-4">Find what you need and send a borrow request to your neighbor.</p>
+        </div>
+        <div class="card text-center">
+            <h3>3. Review & Earn</h3>
+            <p class="text-muted mt-4">Return items, leave reviews, and climb the leaderboard.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4" style="padding: 40px 20px;">
+    <h2 class="text-center mb-4">Featured Items</h2>
+    <div class="grid">
+        {% for item in featured_items %}
+        <div class="card">
+            {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="card-img">
+            {% else %}
+            <div class="card-img"
+                style="display:flex; align-items:center; justify-content:center; background:#E6F0FA; color:#64748B;">No
+                Image</div>
+            {% endif %}
+            <h3>{{ item.title }}</h3>
+            <p class="text-muted mb-4">{{ item.category.name }}</p>
+            <a href="{% url 'item_detail' item.id %}" class="btn-outline" style="display:block; text-align:center;">View
+                Details</a>
+        </div>
+        {% empty %}
+        <p class="text-center" style="grid-column: 1 / -1;">No items available yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container mt-4" style="padding: 60px 20px;">
+    <h2 class="text-center mb-4">Categories</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+        {% for category in categories %}
+        <a href="{% url 'explore' %}?category={{ category.id }}"
+            style="padding: 10px 20px; background: var(--surface-color); border-radius: 30px; border: 1px solid var(--primary-light); color: var(--primary-dark); font-weight: 500;">
+            {{ category.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container" style="padding: 60px 20px; text-align: center;">
+    <h2>What Community says</h2>
+    <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top:30px;">
+        <div class="card" style="font-style: italic;">
+            <p>"I borrowed a drill for my weekend project. Saved me Rs 500 and met a great neighbor!"</p>
+            <p class="mt-4" style="font-weight: 600;">Alex K</p>
+        </div>
+        <div class="card" style="font-style: italic;">
+            <p>"Listed my old camping gear and watching people use it brings me joy. Such a great initiative."</p>
+            <p class="mt-4" style="font-weight: 600;">Sarah Johnson</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

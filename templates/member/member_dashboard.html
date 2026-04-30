@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'explore' %}">Explore Items</a>
+            <a href="{% url 'my_items' %}"
+                class="{% if request.resolver_match.url_name == 'my_items' %}active{% endif %}">My Items</a>
+            <a href="{% url 'my_requests' %}"
+                class="{% if request.resolver_match.url_name == 'my_requests' %}active{% endif %}">Borrow Requests</a>
+            <a href="{% url 'incoming_requests' %}"
+                class="{% if request.resolver_match.url_name == 'incoming_requests' %}active{% endif %}">
+                Incoming Requests
+                {% if pending_requests > 0 %}
+                <span
+                    style="background: var(--primary-color); color: white; border-radius: 10px; padding: 2px 8px; font-size: 0.8rem; margin-left: 5px;">{{ pending_requests }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+            <a href="{% url 'profile' %}">Profile</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;" class="mb-4">
+            <h2>Welcome, {{ request.user.username }}!</h2>
+            {% if request.user.badge %}
+            <span
+                style="background: var(--primary-dark); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">
+                {{ request.user.badge }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_items }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Total Items Added</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ available_items }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Items Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ request.user.points }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Total Points</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ request.user.average_rating|floatformat:1 }}</div>
+                <div style="color: var(--text-muted); font-weight: 500;">Average Rating</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"
+            class="mt-4">
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div class="mt-4" style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="{% url 'add_item' %}" class="btn-primary text-center">Share a New Item</a>
+                    <a href="{% url 'explore' %}" class="btn-outline text-center">Browse Local Items</a>
+                </div>
+            </div>
+
+            <div class="card" style="background: var(--primary-light);">
+                <h3>Incoming Requests</h3>
+                <p class="mt-4 text-muted">You have {{ pending_requests }} pending requests for your items.</p>
+                <div class="mt-4">
+                    <a href="{% url 'incoming_requests' %}" class="btn-primary">View Requests</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

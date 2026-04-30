@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px; padding: 20px;">
+    <div class="card">
+        <h2 class="mb-4 text-center">Review Your Experience</h2>
+
+        <p class="text-center text-muted mb-4">How was your experience borrowing "<strong>{{ item.title }}</strong>"
+            from <strong>{{ item.owner.username }}</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="alert alert-error">
+                Please correct the errors below.
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div style="color: #9B1C1C; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="mt-4" style="display: flex; gap: 15px;">
+                <button type="submit" class="btn-primary" style="flex: 1;">Submit Review</button>
+                <a href="{% url 'my_requests' %}" class="btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

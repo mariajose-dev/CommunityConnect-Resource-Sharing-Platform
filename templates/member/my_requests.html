@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'explore' %}">Explore Items</a>
+            <a href="{% url 'my_items' %}">My Items</a>
+            <a href="{% url 'my_requests' %}" class="active">Borrow Requests</a>
+            <a href="{% url 'incoming_requests' %}">Incoming Requests</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+            <a href="{% url 'profile' %}">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="mb-4">My Borrow Requests</h2>
+
+        <div style="overflow-x: auto;">
+            <table
+                style="width: 100%; border-collapse: collapse; background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-soft);">
+                <thead style="background: var(--primary-light);">
+                    <tr>
+                        <th style="padding: 15px; text-align: left; border-bottom: 2px solid var(--primary-color);">Item
+                        </th>
+                        <th style="padding: 15px; text-align: left; border-bottom: 2px solid var(--primary-color);">
+                            Owner</th>
+                        <th style="padding: 15px; text-align: left; border-bottom: 2px solid var(--primary-color);">
+                            Preferred Date</th>
+                        <th style="padding: 15px; text-align: left; border-bottom: 2px solid var(--primary-color);">
+                            Status</th>
+                        <th style="padding: 15px; text-align: left; border-bottom: 2px solid var(--primary-color);">
+                            Action/Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr style="border-bottom: 1px solid var(--primary-light);">
+                        <td style="padding: 15px;">
+                            <a href="{% url 'item_detail' req.item.id %}"
+                                style="font-weight: 500; color: var(--primary-dark);">{{ req.item.title }}</a>
+                        </td>
+                        <td style="padding: 15px;">{{ req.item.owner.username }}</td>
+                        <td style="padding: 15px;">{{ req.preferred_date }}</td>
+                        <td style="padding: 15px;">
+                            {% if req.status == 'Pending' %}
+                            <span
+                                style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Pending</span>
+                            {% elif req.status == 'Approved' %}
+                            <span
+                                style="background: #DEF7EC; color: #03543F; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Approved</span>
+                            {% else %}
+                            <span
+                                style="background: #FDE8E8; color: #9B1C1C; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">
+                            {% if req.status == 'Approved' %}
+                            {% if not req.history.collected_on %}
+                            <form method="post" action="{% url 'mark_collected' req.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-primary"
+                                    style="padding: 6px 12px; font-size: 0.85rem;">Mark Collected</button>
+                            </form>
+                            {% elif not req.reviewed %}
+                            <a href="{% url 'review_item' req.id %}" class="btn-primary"
+                                style="padding: 6px 12px; font-size: 0.85rem; background: var(--primary-dark); color: white;">Leave
+                                Review</a>
+                            {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">Reviewed</span>
+                            {% endif %}
+                            {% elif req.status == 'Rejected' %}
+                            <div style="font-size: 0.85rem; color: #9B1C1C;">Reason: {{
+                                req.rejection_message|default:"None provided" }}</div>
+                            {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">Waiting for reply...</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center" style="padding: 40px; color: var(--text-muted);">You haven't
+                            requested any items yet. <a href="{% url 'explore' %}"
+                                style="color: var(--primary-dark);">Explore items</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

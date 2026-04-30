@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}">Manage Categories</a>
+            <a href="{% url 'manage_users' %}" class="active">Manage Users</a>
+            <a href="{% url 'all_items' %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="mb-4">Manage Users</h2>
+
+        <div class="card p-0" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--primary-light);">
+                    <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Username</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Email</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Role</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Points</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Status</th>
+                        <th style="padding: 15px; border-bottom: 2px solid var(--primary-color);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr style="border-bottom: 1px solid var(--primary-light);">
+                        <td style="padding: 15px;"><a href="{% url 'user_profile' u.username %}"
+                                style="font-weight: 500; color: var(--primary-dark);">{{ u.username }}</a></td>
+                        <td style="padding: 15px;">{{ u.email }}</td>
+                        <td style="padding: 15px;">{{ u.role }}</td>
+                        <td style="padding: 15px;">{{ u.points }}</td>
+                        <td style="padding: 15px;">
+                            {% if u.is_blocked %}
+                            <span
+                                style="background: #FDE8E8; color: #9B1C1C; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Blocked</span>
+                            {% else %}
+                            <span
+                                style="background: #DEF7EC; color: #03543F; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">Active</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">
+                            {% if u.role != 'Admin' %}
+                            <form method="post" action="{% url 'toggle_block_user' u.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-outline"
+                                    style="padding: 6px 12px; font-size: 0.85rem; {% if not u.is_blocked %}color:#9B1C1C; border-color:#9B1C1C;{% endif %}">
+                                    {% if u.is_blocked %}Unblock{% else %}Block{% endif %}
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 20px;">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

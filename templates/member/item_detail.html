@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="padding: 20px;">
+    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+
+        <!-- Left Column: Image & Details -->
+        <div style="flex: 2; min-width: 300px;">
+            <div class="card p-0" style="overflow: hidden;">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.title }}"
+                    style="width: 100%; height: auto; max-height: 500px; object-fit: cover; display: block;">
+                {% else %}
+                <div
+                    style="width: 100%; height: 300px; background: #E6F0FA; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.2rem;">
+                    No Image Available
+                </div>
+                {% endif %}
+
+                <div style="padding: 30px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h1 style="margin: 0; font-size: 2rem;">{{ item.title }}</h1>
+                        <span
+                            style="background: var(--primary-light); color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-weight: 500;">
+                            {{ item.status }}
+                        </span>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <span style="color: var(--text-muted); font-weight: 500;">Category:</span> {{ item.category.name }}
+                    </div>
+
+                    <h3 style="margin-bottom: 10px;">Description</h3>
+                    <p style="white-space: pre-wrap; color: var(--text-main); line-height: 1.8;">{{ item.description }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Owner Info & Actions -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card mb-4" style="text-align: center;">
+                <h3 style="margin-bottom: 20px; color: var(--text-muted);">Owner Profile</h3>
+
+                {% if item.owner.profile_image %}
+                <img src="{{ item.owner.profile_image.url }}" alt="{{ item.owner.username }}"
+                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px;">
+                {% else %}
+                <div
+                    style="width: 100px; height: 100px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 15px;">
+                    {{ item.owner.username|make_list|first|upper }}
+                </div>
+                {% endif %}
+
+                <a href="{% url 'user_profile' item.owner.username %}"
+                    style="font-size: 1.25rem; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 5px;">
+                    {{ item.owner.username }}
+                </a>
+
+                {% if item.owner.badge %}
+                <div style="color: var(--primary-dark); font-weight: 500; font-size: 0.9rem; margin-bottom: 15px;">{{ item.owner.badge }}</div>
+                {% endif %}
+
+                <div
+                    style="display: flex; justify-content: space-around; margin-bottom: 20px; border-top: 1px solid var(--primary-light); border-bottom: 1px solid var(--primary-light); padding: 15px 0;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.2rem;">★ {{ item.owner.average_rating|floatformat:1 }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Rating</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.2rem;">{{ item.owner.points }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Points</div>
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 25px; color: var(--text-muted);">
+                    <div style="margin-bottom: 8px;"><strong>Locality:</strong> {{ item.owner.locality|default:"Not specified" }}</div>
+                    {% if item.owner.google_map_link %}
+                    <div><a href="{{ item.owner.google_map_link }}" target="_blank"
+                            style="color: var(--primary-dark);"><i class="fas fa-map-marker-alt"></i> View on Map</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if request.user.is_authenticated and item.owner != request.user and item.status == 'Available' %}
+                <a href="{% url 'request_item' item.id %}" class="btn-primary"
+                    style="display: block; margin-bottom: 10px;">Request to Borrow</a>
+                {% elif item.owner == request.user %}
+                <div
+                    style="background: var(--primary-light); color: var(--text-main); padding: 10px; border-radius: var(--radius-md); margin-bottom: 10px;">
+                    This is your item</div>
+                {% else %}
+                <button class="btn-primary"
+                    style="display: block; width: 100%; opacity: 0.5; cursor: not-allowed; margin-bottom: 10px;"
+                    disabled>Not Available</button>
+                {% endif %}
+
+                <a href="{% url 'report_item' item.id %}" class="btn-outline"
+                    style="display: block; color: #9B1C1C; border-color: #FDE8E8; background: #FDE8E8;">Report Item</a>
+            </div>
+
+            {% if item.owner == request.user and incoming_requests %}
+            <div class="card mb-4" style="background: #FFF8E1; border: 1px solid #FFE082;">
+                <h3 style="color: #F57F17; margin-bottom: 15px;">Pending Requests ({{ incoming_requests.count }})</h3>
+                {% for req in incoming_requests %}
+                <div style="background: white; padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px;">
+                    <div style="font-weight: 500;">{{ req.requester.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Needs on: {{
+                        req.preferred_date }}</div>
+                    <div style="display: flex; gap: 10px;">
+                        <form method="post" action="{% url 'approve_request' req.id %}" style="flex: 1;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-primary"
+                                style="width: 100%; padding: 6px; font-size: 0.9rem; background: #03543F; color: white;">Approve</button>
+                        </form>
+                        <a href="{% url 'reject_request' req.id %}" class="btn-outline"
+                            style="flex: 1; text-align: center; padding: 6px; font-size: 0.9rem; border-color: #9B1C1C; color: #9B1C1C;">Reject</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Items -->
+    {% if related_items %}
+    <div style="margin-top: 60px;">
+        <h2 class="mb-4">Related Items in {{ item.category.name }}</h2>
+        <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+            {% for rel_item in related_items %}
+            <div class="card">
+                {% if rel_item.image %}
+                <img src="{{ rel_item.image.url }}" alt="{{ rel_item.title }}" class="card-img" style="height: 150px;">
+                {% else %}
+                <div class="card-img"
+                    style="height: 150px; display:flex; align-items:center; justify-content:center; background:#E6F0FA; color:#64748B;">
+                    No Image</div>
+                {% endif %}
+                <h4 style="margin-bottom: 10px;">{{ rel_item.title }}</h4>
+                <a href="{% url 'item_detail' rel_item.id %}" class="btn-outline"
+                    style="display:block; text-align:center; padding: 8px;">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

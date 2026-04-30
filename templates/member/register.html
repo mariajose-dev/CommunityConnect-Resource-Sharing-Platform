@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px; padding: 40px 20px;">
+    <div class="card">
+        <h2 class="text-center mb-4">Join CommunityConnect</h2>
+
+        {% if form.errors %}
+        <div class="alert alert-error">
+            Please correct the errors below.
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">{{ field.help_text|safe }}
+                </div>
+                {% endif %}
+                {% if field.errors %}
+                <div style="color: #9B1C1C; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Register</button>
+        </form>
+
+        <p class="text-center mt-4">Already have an account? <a href="{% url 'login' %}"
+                style="color: var(--primary-dark); font-weight: 500;">Login</a></p>
+    </div>
+</div>
+
+<style>
+    /* Styling specifically for django generated forms to match our inputs */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--primary-color);
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        background-color: var(--surface-color);
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-dark);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+</style>
+{% endblock %}

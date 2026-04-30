@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}">Manage Categories</a>
+            <a href="{% url 'manage_users' %}">Manage Users</a>
+            <a href="{% url 'all_items' %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h2 class="mb-4">Add New Category</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-error">
+                    Please correct the errors below.
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div style="color: #9B1C1C; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="mt-4" style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">Create Category</button>
+                    <a href="{% url 'manage_categories' %}" class="btn-outline"
+                        style="flex: 1; text-align: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

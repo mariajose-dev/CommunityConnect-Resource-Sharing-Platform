@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'explore' %}">Explore Items</a>
+            <a href="{% url 'my_items' %}">My Items</a>
+            <a href="{% url 'my_requests' %}">Borrow Requests</a>
+            <a href="{% url 'incoming_requests' %}">Incoming Requests</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+            <a href="{% url 'profile' %}" class="active">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h2 class="mb-4 text-center">Edit Profile</h2>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-error">
+                    Please correct the errors below.
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">{{ field.help_text|safe
+                        }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div style="color: #9B1C1C; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="mt-4" style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">Save Changes</button>
+                    <a href="{% url 'profile' %}" class="btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px; padding: 20px;">
+    <div class="card">
+        <h2 class="mb-4 text-center">Reject Request</h2>
+
+        <p class="text-center mb-4">You are rejecting the request from <strong>{{ req.requester.username }}</strong> for
+            "<strong>{{ req.item.title }}</strong>".</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="rejection_message">Reason for Rejection (Optional)</label>
+                <textarea name="rejection_message" id="rejection_message" class="form-input" rows="4"
+                    placeholder="Let them know why..."></textarea>
+            </div>
+
+            <div class="mt-4" style="display: flex; gap: 15px;">
+                <button type="submit" class="btn-primary" style="flex: 1; background: #9B1C1C; color: white;">Confirm
+                    Rejection</button>
+                <a href="{% url 'incoming_requests' %}" class="btn-outline"
+                    style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

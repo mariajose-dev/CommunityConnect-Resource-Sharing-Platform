@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'manage_categories' %}">Manage Categories</a>
+            <a href="{% url 'manage_users' %}">Manage Users</a>
+            <a href="{% url 'all_items' %}">All Items</a>
+            <a href="{% url 'all_borrow_records' %}">Borrow Records</a>
+            <a href="{% url 'monitor_reviews' %}" class="active">Monitor Reviews</a>
+            <a href="{% url 'leaderboard' %}">Leaderboard</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="mb-4">Monitor Reviews</h2>
+
+        <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+            {% for r in reviews %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                    <div>
+                        <div style="font-weight: 500;">Item: <a href="{% url 'item_detail' r.item.id %}"
+                                style="color: var(--primary-dark);">{{ r.item.title }}</a></div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Reviewer: {{ r.reviewer.username }}
+                        </div>
+                    </div>
+                    <div style="color: #F59E0B; font-weight: bold; font-size: 1.1rem;">
+                        {% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}
+                            </div>
+                    </div>
+                    {% if r.comment %}
+                    <p
+                        style="color: var(--text-main); font-style: italic; background: var(--bg-color); padding: 15px; border-radius: var(--radius-md); margin-top: 10px;">
+                        "{{ r.comment }}"</p>
+                    {% endif %}
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 10px;">{{ r.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                {% empty %}
+                <div class="card text-center" style="grid-column: 1 / -1; padding: 40px;">
+                    <p class="text-muted">No reviews in the system yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+    </main>
+</div>
+{% endblock %}
